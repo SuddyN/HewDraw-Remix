@@ -29,6 +29,7 @@ mod catch;
 mod damage;
 mod escape;
 mod dead;
+mod respawn;
 // [LUA-REPLACE-REBASE]
 // [SHOULD-CHANGE]
 // Reimplement the whole status script (already done) instead of doing this.
@@ -427,6 +428,7 @@ pub fn install() {
     damage::install();
     escape::install();
     dead::install();
+    respawn::install();
 
     smashline::install_status_scripts!(
         damage_fly_end,

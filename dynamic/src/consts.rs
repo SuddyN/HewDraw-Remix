@@ -238,6 +238,8 @@ pub mod vars {
 
             pub const ENABLE_UCF: i32 = 0x1000;
 
+            pub const IS_RESPAWN_INVINCIBLE: i32 = 0x1100;
+
             // ints
 
             pub const DOWN_STAND_FB_KIND: i32 = 0x1000;
