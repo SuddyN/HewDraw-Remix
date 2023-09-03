@@ -25,17 +25,6 @@ jobs:
       with:
         repository: HDR-Development/HDR-Nightlies
 
-    - uses: actions/download-artifact@v3
-      with:
-        name: changelog
-        
-    - name: Display structure of downloaded changelog
-      run: ls -R && cp CHANGELOG.md artifacts
-
-    - uses: actions/download-artifact@v3
-      with:
-        name: version
-        
     # build the lvd files
     - id: lvd_files
       uses: robinraju/release-downloader@v1.7
