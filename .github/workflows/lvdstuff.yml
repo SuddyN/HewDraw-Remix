@@ -1,0 +1,80 @@
+name: build_lvd_nightly
+on: 
+  workflow_dispatch:
+
+jobs:
+  ##############  handle the creasion of the full package installation  ##############
+  full_package:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: checkout version
+      uses: actions/checkout@v2
+
+    - id: romfs_version
+      uses: pozetroninc/github-action-get-latest-release@master
+      with:
+        repository: HDR-Development/romfs-release
+
+    - name: make package
+      run: |
+        python3 scripts/full_package.py ${{ needs.version_and_changelog.outputs.version }} ${{ steps.romfs_version.outputs.release }}
+
+    # get the most recent latest full release
+    - id: package_latest
+      uses: pozetroninc/github-action-get-latest-release@master
+      with:
+        repository: HDR-Development/HDR-Nightlies
+
+    # build the upgrade.zip and deletions.json
+    - name: make upgrade artifacts
+      run: |
+        python3 scripts/make_diff.py nightly
+
+    - name: show upgrade artifacts
+      run: |
+        ls && stat * && echo && ls upgrade_artifacts && stat upgrade_artifacts/*
+
+    - uses: actions/download-artifact@v3
+      with:
+        name: changelog
+        
+    - name: Display structure of downloaded changelog
+      run: ls -R && cp CHANGELOG.md artifacts
+
+    - uses: actions/download-artifact@v3
+      with:
+        name: version
+        
+    # build the lvd files
+    - id: lvd_files
+      uses: robinraju/release-downloader@v1.7
+      with:
+        repository: "techyCoder81/SSBU-LVD-data-dump"
+        tag: release
+        fileName: "lvd_dumper.zip"
+
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.408'
+
+    - name: extract lvd data
+      id: lvd_extract
+      shell: bash
+      run: |
+        . scripts/extract_lvd_data.sh
+
+    - name: Display structure of downloaded version
+      run: ls -R && cp hdr_version.txt artifacts
+
+    - name: Push lvd file to Suddy's HDRStageTool
+      uses: dmnemec/copy_file_to_another_repo_action@main
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB_HDRSTAGETOOL }}
+      with:
+        source_file: 'artifacts/lvd.zip'
+        destination_folder: 'beta'
+        destination_repo: 'SuddyN/HDRStageTool'
+        user_email: 'suddy121800@hotmail.com'
+        user_name: 'SuddyN'
+        destination_branch: 'gh-pages'
