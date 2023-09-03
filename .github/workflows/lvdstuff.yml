@@ -25,15 +25,6 @@ jobs:
       with:
         repository: HDR-Development/HDR-Nightlies
 
-    # build the upgrade.zip and deletions.json
-    - name: make upgrade artifacts
-      run: |
-        python3 scripts/make_diff.py nightly
-
-    - name: show upgrade artifacts
-      run: |
-        ls && stat * && echo && ls upgrade_artifacts && stat upgrade_artifacts/*
-
     - uses: actions/download-artifact@v3
       with:
         name: changelog
